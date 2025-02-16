@@ -17,9 +17,9 @@ Source: "venv\*"; DestDir: "{app}\venv"; Flags: ignoreversion recursesubdirs cre
 
 [Run]
 Filename: "{tmp}\python-3.13.2-amd64.exe"; Parameters: "/quiet InstallAllUsers=1 PrependPath=1"; Flags: waituntilterminated
-Filename: "{app}\python.exe"; Parameters: "-m venv venv"; Flags: waituntilterminated
 Filename: "{app}\venv\Scripts\python.exe"; Parameters: "-m pip install --upgrade pip"; Flags: waituntilterminated
 Filename: "{app}\venv\Scripts\python.exe"; Parameters: "-m pip install -r requirements.txt"; Flags: waituntilterminated
 
 [Icons]
 Name: "{group}\DnD Translator"; Filename: "{app}\DnD_Translator.exe"
+Name: "{userdesktop}\DnD Translator"; Filename: "{app}\DnD_Translator.exe"
