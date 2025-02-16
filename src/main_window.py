@@ -27,8 +27,12 @@ class MainWindow(QMainWindow):
     def translate_text(self):
         if self.bold_checkbox.isChecked():
             self.bold = True
+        else:
+            self.bold = False
         if self.italic_checkbox.isChecked():
             self.italic = True
+        else:
+            self.italic = False
         show_text(self.text_editor.toPlainText(),
                   languages_dict[self.language_list.currentText()],
                   self.bold, self.italic)
