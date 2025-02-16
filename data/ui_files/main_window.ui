@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>736</width>
-    <height>480</height>
+    <height>517</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -119,6 +119,32 @@
     </property>
     <property name="text">
      <string>Перевести</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="background_btn">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>420</y>
+      <width>141</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Выбрать фон</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="color_btn">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>450</y>
+      <width>141</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Выбрать цвет текста</string>
     </property>
    </widget>
   </widget>

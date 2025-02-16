@@ -2,12 +2,10 @@ import pygame
 import os
 
 
-def show_text(text, font, bold=False, italic=False):
-    # Если текст пустой, показываем пустое окно
+def show_text(text, font, background=None, color=(255, 255, 255), bold=False, italic=False):
     if not text or text.isspace():
-        text = " "  # Используем пробел вместо пустой строки
+        text = " "
 
-    # Проверяем, не инициализирован ли уже pygame
     if not pygame.get_init():
         pygame.init()
 
@@ -17,10 +15,8 @@ def show_text(text, font, bold=False, italic=False):
 
     scale_factor = 1.0
     lines = text.split('\n')
-    # Убираем пустые строки в конце текста
     while lines and lines[-1].isspace():
         lines.pop()
-    # Если после очистки не осталось строк, добавляем одну пустую
     if not lines:
         lines = [" "]
 
@@ -50,6 +46,7 @@ def show_text(text, font, bold=False, italic=False):
     dragging = False
     offset_x, offset_y = 0, 0
     last_mouse_pos = (0, 0)
+    ctrl_pressed = False
 
     running = True
     try:
@@ -70,15 +67,21 @@ def show_text(text, font, bold=False, italic=False):
                         old_scale = scale_factor
                         scale_factor *= (1.1 if event.y > 0 else 0.9)
                         scale_factor = max(0.1, min(5.0, scale_factor))
+                    elif event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_LCTRL or event.key == pygame.K_RCTRL:
+                            ctrl_pressed = True
+                    elif event.type == pygame.KEYUP:
+                        if event.key == pygame.K_LCTRL or event.key == pygame.K_RCTRL:
+                            ctrl_pressed = False
                     elif event.type == pygame.MOUSEBUTTONDOWN:
-                        if event.button == 1:
-                            dragging = True
+                        if event.button == 1:  # Левая кнопка мыши
+                            dragging = True  # Начинаем перетаскивание в любом случае
                             last_mouse_pos = event.pos
                     elif event.type == pygame.MOUSEBUTTONUP:
                         if event.button == 1:
                             dragging = False
                     elif event.type == pygame.MOUSEMOTION:
-                        if dragging:
+                        if dragging:  # Перетаскивание работает как с Ctrl, так и без него
                             current_pos = event.pos
                             offset_x += current_pos[0] - last_mouse_pos[0]
                             offset_y += current_pos[1] - last_mouse_pos[1]
@@ -106,7 +109,6 @@ def show_text(text, font, bold=False, italic=False):
             except pygame.error:
                 break
     finally:
-        # Убеждаемся, что pygame корректно закрывается даже при ошибках
         pygame.quit()
 
 
