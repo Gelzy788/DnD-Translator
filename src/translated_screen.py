@@ -11,6 +11,18 @@ def show_text(text, font, background=None, color=(255, 255, 255), bold=False, it
 
     width, height = 600, 400
     screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
+
+    # Загружаем и масштабируем фоновое изображение, если оно указано
+    background_surface = None
+    if background:
+        try:
+            background_surface = pygame.image.load(background).convert()
+            background_surface = pygame.transform.scale(
+                background_surface, (width, height))
+        except (pygame.error, FileNotFoundError):
+            print(f"Не удалось загрузить фоновое изображение: {background}")
+            background_surface = None
+
     base_font_size = 36
 
     scale_factor = 1.0
@@ -59,6 +71,17 @@ def show_text(text, font, background=None, color=(255, 255, 255), bold=False, it
                         width, height = event.size
                         screen = pygame.display.set_mode(
                             (width, height), pygame.RESIZABLE)
+                        # Масштабируем фоновое изображение при изменении размера окна
+                        if background_surface and background:
+                            try:
+                                background_surface = pygame.image.load(
+                                    background).convert()
+                                background_surface = pygame.transform.scale(
+                                    background_surface, (width, height))
+                            except (pygame.error, FileNotFoundError):
+                                print(
+                                    f"Не удалось перезагрузить фон: {background}")
+
                         width_scale = (width * 0.9) / max_width
                         height_scale = (height * 0.9) / total_height
                         scale_factor = min(width_scale, height_scale)
@@ -91,13 +114,16 @@ def show_text(text, font, background=None, color=(255, 255, 255), bold=False, it
                 custom_font = pygame.font.Font(font_path, font_size)
 
                 text_surfaces = [custom_font.render(
-                    line, True, (255, 255, 255)) for line in lines]
+                    line, True, color) for line in lines]
 
                 line_height = custom_font.get_linesize()
                 total_height = line_height * len(lines)
                 start_y = (height - total_height) // 2 + offset_y
 
-                screen.fill((0, 0, 0))
+                if background_surface:
+                    screen.blit(background_surface, (0, 0))
+                else:
+                    screen.fill((0, 0, 0))
 
                 for i, surface in enumerate(text_surfaces):
                     text_rect = surface.get_rect(
@@ -106,7 +132,8 @@ def show_text(text, font, background=None, color=(255, 255, 255), bold=False, it
 
                 pygame.display.flip()
 
-            except pygame.error:
+            except pygame.error as e:
+                print(f"Ошибка pygame: {e}")
                 break
     finally:
         pygame.quit()

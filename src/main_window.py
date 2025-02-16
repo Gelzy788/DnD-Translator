@@ -24,6 +24,7 @@ class MainWindow(QMainWindow):
         self.bold = False
         self.italic = False
         self.color = (255, 255, 255)
+        self.background = None
 
         self.translate_btn.clicked.connect(self.translate_text)
         self.color_btn.clicked.connect(self.choose_color)
@@ -38,9 +39,10 @@ class MainWindow(QMainWindow):
             self.italic = True
         else:
             self.italic = False
+
         show_text(self.text_editor.toPlainText(),
                   languages_dict[self.language_list.currentText()],
-                  self.bold, self.italic)
+                  self.background[0], self.color, self.bold, self.italic)
 
     def choose_color(self):
         color = QColorDialog.getColor()
