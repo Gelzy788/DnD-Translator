@@ -53,20 +53,20 @@ class MainWindow(QMainWindow):
         self.background = QFileDialog.getOpenFileName(
             self, "Выберите фон", "data/backgrounds", "Изображения (*.png *.jpg *.jpeg)")
 
-        if self.background[0]:
-            existing_files = os.listdir("data/backgrounds")
+        if self.background[0]:  # Проверяем, что файл был выбран
+            original_file_name = os.path.basename(
+                self.background[0])  # Извлекаем имя файла
+            destination_path = os.path.join(
+                "data/backgrounds", original_file_name)  # Полный путь к новому файлу
 
-            max_number = 0
-            for file in existing_files:
-                if file.startswith("background") and file.endswith(".png"):
-                    try:
-                        number = int(file[10:-4])
-                        if number > max_number:
-                            max_number = number
-                    except ValueError:
-                        continue
-
-            new_file_name = f"background{max_number + 1}.png"
-            destination_path = os.path.join("data/backgrounds", new_file_name)
-
-        shutil.copy(self.background[0], destination_path)
+            # Проверяем, находится ли файл в той же папке
+            if os.path.dirname(self.background[0]) == os.path.dirname(destination_path):
+                print(
+                    "Файл не может быть сохранен в той же папке, откуда он был выбран.")
+            else:
+                # Проверяем, существует ли файл с таким именем
+                if os.path.exists(destination_path):
+                    print("Файл с таким именем уже существует. Сохранение отменено.")
+                else:
+                    # Копируем файл
+                    shutil.copy(self.background[0], destination_path)
