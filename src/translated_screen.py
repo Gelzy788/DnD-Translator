@@ -1,67 +1,74 @@
 import pygame
 import os
+import sys
 
 
 def show_text(text, font, background=None, color=(255, 255, 255), bold=False, italic=False):
-    if not text or text.isspace():
-        text = " "
+    try:
+        if not text or text.isspace():
+            text = " "
 
-    if not pygame.get_init():
-        pygame.init()
+        if not pygame.get_init():
+            pygame.init()
 
-    width, height = 600, 400
-    screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
+        width, height = 600, 400
+        screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
 
-    # Загружаем и масштабируем фоновое изображение, если оно указано
-    background_surface = None
-    if background:
-        try:
-            background_surface = pygame.image.load(background).convert()
-            background_surface = pygame.transform.scale(
-                background_surface, (width, height))
-        except (pygame.error, FileNotFoundError):
-            print(f"Не удалось загрузить фоновое изображение: {background}")
-            background_surface = None
+        # Загружаем и масштабируем фоновое изображение, если оно указано
+        background_surface = None
+        if background:
+            try:
+                if hasattr(sys, '_MEIPASS'):
+                    background = os.path.join(sys._MEIPASS, background)
+                background_surface = pygame.image.load(background).convert()
+                background_surface = pygame.transform.scale(
+                    background_surface, (width, height))
+            except (pygame.error, FileNotFoundError) as e:
+                print(
+                    f"Не удалось загрузить фоновое изображение: {background}, ошибка: {e}")
+                background_surface = None
 
-    base_font_size = 36
+        base_font_size = 36
 
-    scale_factor = 1.0
-    lines = text.split('\n')
-    while lines and lines[-1].isspace():
-        lines.pop()
-    if not lines:
-        lines = [" "]
+        scale_factor = 1.0
+        lines = text.split('\n')
+        while lines and lines[-1].isspace():
+            lines.pop()
+        if not lines:
+            lines = [" "]
 
-    if font != "harpers" and font != 'infernal':
-        if bold and italic:
-            font_path = f'data/fonts/{font}/{font}-bold-italic.ttf'
-        elif bold:
-            font_path = f'data/fonts/{font}/{font}-bold.ttf'
-        elif italic:
-            font_path = f'data/fonts/{font}/{font}-italic.ttf'
+        if font != "harpers" and font != 'infernal':
+            if bold and italic:
+                font_path = f'data/fonts/{font}/{font}-bold-italic.ttf'
+            elif bold:
+                font_path = f'data/fonts/{font}/{font}-bold.ttf'
+            elif italic:
+                font_path = f'data/fonts/{font}/{font}-italic.ttf'
+            else:
+                font_path = f'data/fonts/{font}/{font}.ttf'
         else:
             font_path = f'data/fonts/{font}/{font}.ttf'
-    else:
-        font_path = f'data/fonts/{font}/{font}.ttf'
 
-    temp_font = pygame.font.Font(font_path, base_font_size)
+        if hasattr(sys, '_MEIPASS'):
+            font_path = os.path.join(sys._MEIPASS, font_path)
 
-    max_width = max(temp_font.size(line)[0] for line in lines)
-    total_height = temp_font.get_linesize() * len(lines)
+        temp_font = pygame.font.Font(font_path, base_font_size)
 
-    width_scale = (width * 0.9) / max_width
-    height_scale = (height * 0.9) / total_height
+        max_width = max(temp_font.size(line)[0] for line in lines)
+        total_height = temp_font.get_linesize() * len(lines)
 
-    scale_factor = min(width_scale, height_scale)
-    scale_factor = max(0.1, min(5.0, scale_factor))
+        width_scale = (width * 0.9) / max_width
+        height_scale = (height * 0.9) / total_height
 
-    dragging = False
-    offset_x, offset_y = 0, 0
-    last_mouse_pos = (0, 0)
-    ctrl_pressed = False
+        scale_factor = min(width_scale, height_scale)
+        scale_factor = max(0.1, min(5.0, scale_factor))
 
-    running = True
-    try:
+        dragging = False
+        offset_x, offset_y = 0, 0
+        last_mouse_pos = (0, 0)
+        ctrl_pressed = False
+
+        running = True
         while running:
             try:
                 for event in pygame.event.get():
@@ -135,6 +142,8 @@ def show_text(text, font, background=None, color=(255, 255, 255), bold=False, it
             except pygame.error as e:
                 print(f"Ошибка pygame: {e}")
                 break
+    except Exception as e:
+        print(f"Ошибка в функции show_text: {e}")
     finally:
         pygame.quit()
 

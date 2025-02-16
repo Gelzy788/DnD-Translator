@@ -3,6 +3,7 @@ from PyQt6.uic import loadUi
 import shutil
 from translated_screen import show_text
 import os
+import sys
 
 languages_dict = {
     "Эльфийский": "rellanic",
@@ -19,7 +20,16 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("DnD Translator")
-        loadUi('data/ui_files/main_window.ui', self)
+
+        # Определяем путь к файлу UI
+        if hasattr(sys, '_MEIPASS'):
+            ui_file_path = os.path.join(
+                sys._MEIPASS, 'data/ui_files/main_window.ui')
+        else:
+            ui_file_path = os.path.join(os.path.dirname(
+                __file__), '../data/ui_files/main_window.ui')
+
+        loadUi(ui_file_path, self)
 
         self.bold = False
         self.italic = False
@@ -50,23 +60,30 @@ class MainWindow(QMainWindow):
             self.color = (color.red(), color.green(), color.blue())
 
     def load_background(self):
-        self.background = QFileDialog.getOpenFileName(
-            self, "Выберите фон", "data/backgrounds", "Изображения (*.png *.jpg *.jpeg)")
+        try:
+            self.background = QFileDialog.getOpenFileName(
+                self, "Выберите фон", "data/backgrounds", "Изображения (*.png *.jpg *.jpeg)")
 
-        if self.background[0]:  # Проверяем, что файл был выбран
-            original_file_name = os.path.basename(
-                self.background[0])  # Извлекаем имя файла
-            destination_path = os.path.join(
-                "data/backgrounds", original_file_name)  # Полный путь к новому файлу
-
-            # Проверяем, находится ли файл в той же папке
-            if os.path.dirname(self.background[0]) == os.path.dirname(destination_path):
-                print(
-                    "Файл не может быть сохранен в той же папке, откуда он был выбран.")
-            else:
-                # Проверяем, существует ли файл с таким именем
-                if os.path.exists(destination_path):
-                    print("Файл с таким именем уже существует. Сохранение отменено.")
+            if self.background[0]:  # Проверяем, что файл был выбран
+                original_file_name = os.path.basename(self.background[0])
+                if hasattr(sys, '_MEIPASS'):
+                    destination_path = os.path.join(
+                        sys._MEIPASS, "data/backgrounds", original_file_name)
                 else:
-                    # Копируем файл
-                    shutil.copy(self.background[0], destination_path)
+                    destination_path = os.path.join(
+                        "data/backgrounds", original_file_name)
+
+                # Проверяем, находится ли файл в той же папке
+                if os.path.dirname(self.background[0]) == os.path.dirname(destination_path):
+                    print(
+                        "Файл не может быть сохранен в той же папке, откуда он был выбран.")
+                else:
+                    # Проверяем, существует ли файл с таким именем
+                    if os.path.exists(destination_path):
+                        print(
+                            "Файл с таким именем уже существует. Сохранение отменено.")
+                    else:
+                        # Копируем файл
+                        shutil.copy(self.background[0], destination_path)
+        except Exception as e:
+            print(f"Ошибка при загрузке фона: {e}")
